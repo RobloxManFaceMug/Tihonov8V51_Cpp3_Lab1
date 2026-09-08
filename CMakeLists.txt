@@ -1,20 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
+set(PATCH_VERSION "1" CACHE INTERNAL "Patch version")
+set(PROJECT_VESRION 0.0.${PATCH_VERSION})
 
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME ON)
-
-if(NOT PATCH_VERSION)
-    set(PATCH_VERSION "1")
-endif()
-
-set(PROJECT_VERSION 1.0.${PATCH_VERSION})
-project(helloworld VERSION ${PROJECT_VERSION})
-
-project(helloworld VERSION ${PROJECT_VERSION})
-
-cmake_policy(SET CMP0167 NEW)
+project(helloworld VERSION ${PROJECT_VESRION})
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
@@ -28,7 +17,6 @@ set_target_properties(helloworld_cli helloworld test_version PROPERTIES
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED ON
 )
-
 target_include_directories(helloworld
     PRIVATE "${CMAKE_BINARY_DIR}"
 )
