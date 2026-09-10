@@ -50,7 +50,7 @@ jobs:
         
       - run: choco install boost-msvc-14.3 -y
       - run: cmake . -DPATCH_VERSION=${{ github.run_number }}
-      - run: cmake --build .
+      - run: cmake --build . --config Release
       - run: cmake --build . --target test
       - run: cmake --build . --target package
 
@@ -75,3 +75,6 @@ jobs:
           asset_path: ./helloworld-0.0.${{ github.run_number }}-Linux.deb
           asset_name: helloworld-0.0.${{ github.run_number }}-Linux.deb
           asset_content_type: application/vnd.debian.binary-package
+
+  # create-release:
+  #   needs: [build-ubuntu, build-windows]
