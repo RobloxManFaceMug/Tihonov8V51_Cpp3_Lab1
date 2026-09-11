@@ -50,6 +50,10 @@ target_link_libraries(test_version PRIVATE
     helloworld
 )
 
+if(MSVC)
+    target_compile_definitions(test_version PRIVATE BOOST_ALL_NO_LIB)
+endif()
+
 if (MSVC)
     target_compile_options(helloworld_cli PRIVATE /W4)
     target_compile_options(helloworld PRIVATE /W4)
