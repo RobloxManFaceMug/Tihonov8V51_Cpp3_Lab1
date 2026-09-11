@@ -5,7 +5,6 @@ if (MSVC)
     set(Boost_USE_MULTITHREADED ON)
     set(Boost_USE_STATIC_RUNTIME OFF)
 else()
-    # MinGW or Linux
     set(Boost_USE_STATIC_LIBS OFF)
 endif()
 
