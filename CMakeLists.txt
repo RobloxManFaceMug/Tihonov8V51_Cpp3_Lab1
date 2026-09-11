@@ -1,9 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 
+cmake_minimum_required(VERSION 3.10)
+
 if (MSVC)
     set(Boost_USE_STATIC_LIBS ON)
     set(Boost_USE_MULTITHREADED ON)
     set(Boost_USE_STATIC_RUNTIME OFF)
+    
+    link_directories("C:/local/boost_1_87_0/lib64-msvc-14.3")
 else()
     set(Boost_USE_STATIC_LIBS OFF)
 endif()

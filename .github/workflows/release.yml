@@ -49,10 +49,7 @@ jobs:
         run: choco install boost-msvc-14.3 -y
       
       - name: Configure CMake
-        shell: bash
-        run: cmake . -DPATCH_VERSION=${{ github.run_number }}
-        env:
-          BOOST_ROOT: C:\local\boost_1_87_0
+        run: cmake . -A x64 -DPATCH_VERSION=${{ github.run_number }} -DBOOST_ROOT="C:\local\boost_1_87_0"
       
       - name: Build
         run: cmake --build . --config Release
