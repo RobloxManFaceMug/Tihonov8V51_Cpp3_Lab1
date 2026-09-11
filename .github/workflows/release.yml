@@ -44,12 +44,15 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
-      
+
       - name: Install Boost
         run: choco install boost-msvc-14.3 -y
-      
+
       - name: Configure CMake
-        run: cmake . -DPATCH_VERSION=${{ github.run_number }}
+        run: |
+          cmake . -DPATCH_VERSION=${{ github.run_number }} `
+                  -DBOOST_ROOT="C:\local\boost_1_87_0" `
+                  -DBOOST_LIBRARYDIR="C:\local\boost_1_87_0\lib64-msvc-14.3"
       
       - name: Build
         run: cmake --build .
