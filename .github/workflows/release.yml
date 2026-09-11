@@ -55,7 +55,7 @@ jobs:
                   -DBOOST_LIBRARYDIR="C:\local\boost_1_87_0\lib64-msvc-14.3"
       
       - name: Build
-        run: cmake --build .
+        run: cmake --build . --config release
       
       - name: Test
         run: ctest -C Release
