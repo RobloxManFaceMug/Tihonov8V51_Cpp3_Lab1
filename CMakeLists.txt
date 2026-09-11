@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 
-set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
@@ -13,13 +13,24 @@ set(PROJECT_VERSION 1.0.${PATCH_VERSION})
 
 project(helloworld VERSION ${PROJECT_VERSION})
 
+cmake_policy(SET CMP0167 OLD)
+
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 configure_file(version.h.in version.h)
 
+execute_process(
+    COMMAND git describe --tags --always --dirty
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_RELEASE_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
 add_executable(helloworld_cli main.cpp)
 add_library(helloworld lib.cpp)
 add_executable(test_version test_version.cpp)
+
+target_compile_definitions(helloworld PRIVATE GIT_RELEASE="${GIT_RELEASE_VERSION}")
 
 set_target_properties(helloworld_cli helloworld test_version PROPERTIES
     CXX_STANDARD 14
