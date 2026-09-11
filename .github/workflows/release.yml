@@ -49,8 +49,9 @@ jobs:
         run: choco install boost-msvc-14.3 -y
 
       - name: Configure CMake
-        run: |
-          cmake . -DPATCH_VERSION=${{ github.run_number }} `
+       run: |
+          cmake . -G "Visual Studio 17 2022" -A x64 `
+                  -DPATCH_VERSION=${{ github.run_number }} `
                   -DBOOST_ROOT="C:\local\boost_1_87_0" `
                   -DBOOST_LIBRARYDIR="C:\local\boost_1_87_0\lib64-msvc-14.3"
       
