@@ -15,17 +15,8 @@ project(helloworld VERSION ${PROJECT_VERSION})
 project(helloworld VERSION ${PROJECT_VERSION})
 
 cmake_policy(SET CMP0167 OLD)
-
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
-find_package(Git QUIET)
 
-execute_process(
-        COMMAND ${GIT_EXECUTABLE} describe --tags --always --dirty
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE GIT_RELEASE_VERSION
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    
 configure_file(version.h.in version.h)
 
 add_executable(helloworld_cli main.cpp)
@@ -53,7 +44,6 @@ target_link_libraries(test_version PRIVATE
     Boost::unit_test_framework
     helloworld
 )
-
 
 if (MSVC)
     target_compile_options(helloworld_cli PRIVATE /W4)
