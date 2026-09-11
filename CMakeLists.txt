@@ -50,10 +50,11 @@ target_link_libraries(helloworld_cli PRIVATE
     helloworld
 )
 
-target_link_libraries(test_version
-    ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+target_link_libraries(test_version PRIVATE
+    Boost::unit_test_framework
     helloworld
 )
+
 
 if (MSVC)
     target_compile_options(helloworld_cli PRIVATE /W4)
