@@ -1,7 +1,10 @@
-// #include "lib.h"
+#include "lib.h"
 
-// #include "version.h"
+#include "version.h"
 
-// int version() {
-//     return PROJECT_VERSION_PATCH;
-// }
+int version() {
+    
+    const char* a = GIT_RELEASE_VERSION;
+
+    return a[1] - '0';
+}
