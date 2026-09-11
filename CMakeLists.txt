@@ -10,27 +10,27 @@ if(NOT PATCH_VERSION)
 endif()
 
 set(PROJECT_VERSION 1.0.${PATCH_VERSION})
+project(helloworld VERSION ${PROJECT_VERSION})
 
 project(helloworld VERSION ${PROJECT_VERSION})
 
 cmake_policy(SET CMP0167 OLD)
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
-
-configure_file(version.h.in version.h)
+find_package(Git QUIET)
 
 execute_process(
-    COMMAND git describe --tags --always --dirty
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    OUTPUT_VARIABLE GIT_RELEASE_VERSION
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+        COMMAND ${GIT_EXECUTABLE} describe --tags --always --dirty
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_RELEASE_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    
+configure_file(version.h.in version.h)
 
 add_executable(helloworld_cli main.cpp)
 add_library(helloworld lib.cpp)
 add_executable(test_version test_version.cpp)
-
-target_compile_definitions(helloworld PRIVATE GIT_RELEASE="${GIT_RELEASE_VERSION}")
 
 set_target_properties(helloworld_cli helloworld test_version PROPERTIES
     CXX_STANDARD 14
@@ -41,7 +41,6 @@ target_include_directories(helloworld
     PRIVATE "${CMAKE_BINARY_DIR}"
 )
 
-# BOOST_TEST_DYN_LINK is an agent of satan
 target_include_directories(test_version PRIVATE
     ${Boost_INCLUDE_DIRS}
     ${CMAKE_BINARY_DIR}
