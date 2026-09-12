@@ -7,6 +7,25 @@ endif()
 set(PROJECT_VERSION 1.0.${PATCH_VERSION})
 project(helloworld VERSION ${PROJECT_VERSION})
 
+find_package(Git QUIET)
+if(GIT_FOUND)
+    # Execute git describe
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --tags --always --dirty
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_RELEASE_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+else()
+    set(GIT_RELEASE_VERSION "unknown")
+endif()
+
+configure_file(
+    ${CMAKE_SOURCE_DIR}/version.h.in
+    ${CMAKE_BINARY_DIR}/generated/version.h
+)
+
+include_directories(${CMAKE_BINARY_DIR}/generated)
 
 set(Boost_USE_STATIC_LIBS OFF)          
 set(Boost_USE_MULTITHREADED ON)
