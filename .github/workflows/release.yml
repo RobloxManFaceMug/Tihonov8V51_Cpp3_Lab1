@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - master
       - feature/github_actions
 
 jobs:
@@ -12,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       
@@ -20,66 +19,90 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libboost-test-dev -y
       
       - name: Configure CMake
-        run: cmake . -DPATCH_VERSION=${{ github.run_number }}
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DPATCH_VERSION=${{ github.run_number }}
       
       - name: Build
-        run: cmake --build .
+        run: |
+          cd build
+          cmake --build . --config Release
       
       - name: Run tests
-        run: cmake --build . --target test
+        run: |
+          cd build
+          ctest --output-on-failure -C Release
       
       - name: Package
-        run: cmake --build . --target package
+        run: |
+          cd build
+          cmake --build . --target package
       
       - name: Upload Ubuntu artifact
         uses: actions/upload-artifact@v4
         with:
           name: ubuntu-package
-          path: ./helloworld-1.0.${{ github.run_number }}-Linux.deb
+          path: build/*.deb
 
   build-windows:
     runs-on: windows-latest
     permissions: write-all
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       
-      - name: Install Boost
-        run: choco install boost-msvc-14.3 -y
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: |
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-boost
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-ninja
       
       - name: Configure CMake
-        run: cmake . -A x64 -DPATCH_VERSION=${{ github.run_number }} -DBOOST_ROOT="C:\local\boost_1_87_0" -DBOOST_LIBRARYDIR="C:\local\boost_1_87_0\lib64-msvc-14.3"
+        shell: msys2 {0}
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DPATCH_VERSION=${{ github.run_number }}
       
       - name: Build
-        run: cmake --build . --config Release
+        shell: msys2 {0}
+        run: |
+          cd build
+          ninja
       
       - name: Run tests
-        run: ctest -C Release
+        shell: msys2 {0}
+        run: |
+          cd build
+          ctest --output-on-failure -C Release
       
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-exe
-          path: ./Release/helloworld_cli.exe
+          path: build/helloworld_cli.exe
 
   create-release:
     needs: [build-ubuntu, build-windows]
     runs-on: ubuntu-latest
     permissions: write-all
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: ./artifacts
       
-      - name: Rename Windows executable
-        run: |
-          mv ./artifacts/windows-exe/helloworld_cli.exe ./artifacts/windows-exe/helloworld-1.0.${{ github.run_number }}-Windows.exe
-      
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -89,4 +112,4 @@ jobs:
           prerelease: false
           files: |
             ./artifacts/ubuntu-package/*.deb
-            ./artifacts/windows-exe/*.exe
+            ./artifacts/windows-exe/helloworld_cli.exe
